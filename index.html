@@ -1,7 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test site</title>
+    <!-- Include Bootstrap v5.3.1 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+
+<div id="app" class="container mt-5">
+    <pre>{{ jsonData }}</pre>
+</div>
+
+<!-- Include Vue 3 from CDN -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="./structure.js"></script>
+<!-- Include the latest version of Bootstrap JS and Popper.js (required for Bootstrap's JavaScript plugins) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+<script>
+    console.log(jsonData)
+
+    const app = Vue.createApp({
+        data() {
+            return {
+                jsonData: jsonData
+            };
+        }
+    });
+
+    app.mount('#app');
+</script>
+
 </body>
 </html>
