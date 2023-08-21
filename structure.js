@@ -1,30 +1,32 @@
 const jsonData = {
-    "datastructure.html": {
-        "doc_title": "Data view page",
-        "doc_order": 1,
-        "doc_id": 3,
-        "path": "datastructure.html"
+    "DataSources": {
+        "datastructure.html": {
+            "doc_title": "Data structure page",
+            "doc_order": 1,
+            "doc_id": 3,
+            "path": "DataSources/datastructure.html"
+        }
     },
-    "dataviews.html": {
-        "doc_title": "Data structure page",
-        "doc_order": 3,
-        "doc_id": 1,
-        "path": "dataviews.html"
+    "DataViews": {
+        "dataviews.html": {
+            "doc_title": "Data view page",
+            "doc_order": 3,
+            "doc_id": 1,
+            "path": "DataViews/dataviews.html"
+        }
     },
-    "layouts": {
+    "Layouts": {
         "layout.html": {
             "doc_title": "Layout page",
             "doc_order": 1,
             "doc_id": 2,
-            "path": "layouts/layout.html"
+            "path": "Layouts/layout.html"
         },
-        "ai": {
-            "openai.html": {
-                "doc_title": "AI layout page",
-                "doc_order": 1,
-                "doc_id": 4,
-                "path": "layouts/ai/openai.html"
-            }
+        "openai.html": {
+            "doc_title": "AI layout page",
+            "doc_order": 1,
+            "doc_id": 4,
+            "path": "Layouts/openai.html"
         }
     }
 }

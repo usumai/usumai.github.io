@@ -61,5 +61,5 @@ tree_structure = build_tree(directory_path, ignore_patterns, ignore_regex)
 
 # Save the structure to a JS file named "structure.js"
 with open('structure.js', 'w') as js_file:
-    js_file.write("export const jsonData = ")
+    js_file.write("const jsonData = ")
     json.dump(tree_structure, js_file, indent=4)

@@ -4,33 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test site</title>
-    <!-- Include Bootstrap v5.3.1 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 </head>
 <body>
 
-<div id="app" class="container mt-5">
-    <pre>{{ jsonData }}</pre>
+<style>
+.navbar-brand {
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+  background-color: rgba(0, 0, 0, .25);
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+}
+.menu_btn{
+    cursor:pointer
+}
+</style>
+
+<div id="app">
+
+    <body>
+        
+    <header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
+      <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" href="#">Documentation</a>
+    
+    
+    </header>
+    
+    <div class="container-fluid">
+      <div class="row">
+        <div class="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary">
+          <div class="offcanvas-md offcanvas-end bg-body-tertiary" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="sidebarMenuLabel">Company name</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto">
+              <ul class="nav flex-column">
+                <template v-for="(part, partidx) in jsonData">
+                    <li class="nav-item"  v-if="part.doc_title">
+                        <div class="menu_btn" @click="navigateTo(part)">
+                          {{ part.doc_title }}
+                        </div>
+                    </li>
+                    <template class="nav-item" v-else>
+                        <li class="menu_btn" @click="expandPart(partidx)">
+                            {{ partidx }}
+                        </li>
+                        
+                        <li class="nav-item" 
+                            v-for="(subpart, subpartidx) in jsonData[partidx]"
+                            v-if="jsonData[partidx].visible">
+                            <div class="menu_btn" @click="navigateTo(subpart)">
+                            {{ subpart.doc_title }}
+                            </div>
+                        </li>
+                    </template>
+                </template>
+                <li class="nav-item">
+                    <div class="menu_btn" @click="createNewPage()">
+                        Generate new page
+                    </div>
+                </li>
+                
+              </ul>
+    
+            </div>
+          </div>
+        </div>
+    
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Dashboard</h1>
+          </div>
+          <iframe id="myIframe" width="600" height="400" src="https://www.example.com"></iframe>
+
+          {{ message }}
+          <pre>{{ jsonData }}</pre>
+
+        </main>
+      </div>
+    </div>
+    
+    
+    </body>
 </div>
 
-<!-- Include Vue 3 from CDN -->
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="./structure.js"></script>
-<!-- Include the latest version of Bootstrap JS and Popper.js (required for Bootstrap's JavaScript plugins) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-<script>
-    console.log(jsonData)
 
-    const app = Vue.createApp({
-        data() {
-            return {
-                jsonData: jsonData
-            };
+
+<script type="module">
+  import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js'
+
+  createApp({
+    data() {
+        return {
+            jsonData: jsonData
+        };
+    },
+    setup() {
+      const message = ref('Hello Vue!')
+      return {
+        message
+      }
+    },
+    methods: {
+        navigateTo(part){
+            this.changeIframeSrc('myIframe', part.path);
+        },
+        changeIframeSrc(iframeId, filename) {
+            const iframe = document.getElementById(iframeId);
+            if (iframe) {
+                let baseUrl = window.location.href.split('/').slice(0, -1).join('/');
+                let newSrc = `${baseUrl}/docs/${filename}`;
+                iframe.src = newSrc;
+            }
+        },
+        isLocallyHosted() {// Use this to autogenerate new pages, using the json file to calc the next page part id
+            return window.location.protocol === 'file:';
+        },
+        expandPart(partidx) {
+            this.jsonData[partidx].visible = !this.jsonData[partidx].visible
+        },
+        createNewPage(){
+            let newId = this.getNextDocId()
+            console.log(newId)
+        },
+        getNextDocId() {
+            let maxId = 0;
+            for (let category in this.jsonData) {
+                for (let file in this.jsonData[category]) {
+                    if (this.jsonData[category][file].doc_id > maxId) {
+                        maxId = this.jsonData[category][file].doc_id;
+                    }
+                }
+            }
+            return maxId + 1;
         }
-    });
-
-    app.mount('#app');
+    },
+  }).mount('#app')
 </script>
+
 
 </body>
 </html>
