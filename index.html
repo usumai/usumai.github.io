@@ -20,7 +20,8 @@
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
 }
 .menu_btn{
-    cursor:pointer
+  cursor:pointer;
+  padding:5px;
 }
 </style>
 
@@ -48,6 +49,7 @@
                 
                 <template v-for="(page, pageno) in json_pages">
                   <li class="nav-item menu_btn"
+                      :class="{'bg-dark':apid==pageno,'text-light':apid==pageno}"
                       v-if="page.category==''"
                       @click="changePage(page)">
                         {{ page.title }}
@@ -55,13 +57,17 @@
                 </template>
 
 
-                <template v-for="(cat, catname) in json_cats"
-                :key="catname">
-                  <li class="nav-item menu_btn" @click="cat.visible=!cat.visible">
+                <template v-for="(cat, catname) in json_cats" :key="catname">
+                  <li class="nav-item menu_btn" 
+                      @click="activateCategory(catname)">
                     <strong>{{catname}}</strong>
+                    <button class="btn btn-sm btn-danger float-end" 
+                            v-if="show_categories"
+                            @click="deleteCategory(catname)">Delete</button>
                   </li>
                   <template v-for="(page, pageno) in json_pages" v-if="cat.visible">
                     <li class="nav-item menu_btn"
+                        :class="{'bg-dark':apid==pageno,'text-light':apid==pageno}"
                         v-if="page.category==catname"
                         @click="changePage(page)">
                         &nbsp;&nbsp;{{ page.title }}
@@ -69,17 +75,18 @@
                   </template>
                 </template>
               </ul>
-
               
+
+
+              <br><br><br><br><br><br><br><br><br><br><br>
+              <br><br><br><br><br><br><br><br><br><br><br>
               <button class="btn btn-outline-dark float-end" 
                       @click="addPage()">Add page</button>
-
-
-              <br><br><br><br><br><br><br><br><br><br><br>
-              <br><br><br><br><br><br><br><br><br><br><br>
+              <button class="btn btn-outline-dark float-end" 
+                      @click="editCategories()">Categories</button>
               <button class="btn btn-outline-dark float-end" 
                       @click="copyToClipboard()">{{ copy_btn_text }}</button>
-              <!-- <pre>{{ jsonData }}</pre> -->
+              <pre>{{ jsonData }}</pre>
               <br><br><br><br><br><br><br><br><br><br><br>
               <br><br><br><br><br><br><br><br><br><br><br>
     
@@ -120,7 +127,10 @@
                 <td width="20%" class="pt-3">Category</td>
                 <td>
                   <span class="btn btn-sm btn-dark mr-4" @click="selected_page.category=''">Clear</span>
-                  <span v-for="(cat, catname) in json_cats" class="btn btn-sm btn-dark mr-4" @click="selected_page.category=catname">{{catname}}</span>
+                  <span v-for="(cat, catname) in json_cats" 
+                        class="btn btn-sm btn-dark mr-4" 
+                        v-if="catname!=''"
+                        @click="selected_page.category=catname">{{catname}}</span>
                   <input type="text" class="form-control" v-model="selected_page.category">
                 </td>
               </tr>
@@ -156,21 +166,39 @@
   createApp({
     data() {
         return {
-            jsonData: jsonData,
-            json_cats: {},
-            json_pages: {},
-            quill: null,
-            selected_page: {},
-            show_editor: false,
-            copy_btn_text: "Copy",
+            jsonData:       jsonData,
+            json_cats:      {},
+            json_pages:     {},
+            quill:          null,
+            selected_page:  {},
+            copy_btn_text:  "Copy structure",
+            apid:           "",
+            show_editor:    false,
+            show_categories:false,
         };
     },
     setup() {
+      // let url_params = new URLSearchParams(window.location.search);
+      // this.apid = url_params.get('apid')
+      // if(this.apid){
+      //   this.selected_page = this.json_pages[this.apid]
+      // }else{
+        // this.selected_page = this.json_pages[1]
+      // }
       // this.changeIframeSrc('myIframe', 'homepage.html')
     },
     mounted() {
+      let url_params = new URLSearchParams(window.location.search);
+      this.apid = url_params.get('apid')
       this.syncData();
-      this.selected_page = this.json_pages[1]
+      if(this.apid){
+        this.selected_page = this.json_pages[this.apid]
+      }else{
+        this.selected_page = this.json_pages[1]
+      }
+      if(this.selected_page.category){
+        this.jsonData.categories[this.selected_page.category].visible=true;
+      }
     },
     methods: {
         reorderCategories(reorderObj){
@@ -183,6 +211,10 @@
         },
 
         async copyToClipboard() {
+          
+          for(let cat in this.jsonData["categories"]){
+            this.jsonData["categories"][cat].visible = false
+          }
           try {
             let jsonString = JSON.stringify(this.jsonData, null, 2); 
             jsonString="const jsonData = "+jsonString
@@ -192,7 +224,7 @@
             this.copy_btn_text = "Copy failed!"
           }
           await this.wait(5000);
-          this.copy_btn_text = "Copy"
+          this.copy_btn_text = "Copy structure"
         },
 
         wait(ms) {
@@ -201,8 +233,10 @@
 
 
         changePage(page){
+          this.apid = page.id
           this.selected_page=page
           this.show_editor = false
+          window.history.pushState({}, '', '?apid='+this.apid)
         },
         editPage(){
           this.show_editor = true
@@ -249,6 +283,25 @@
         syncData() {
           this.json_pages = this.reorderCategories(this.jsonData["pages"]);
           this.json_cats = this.reorderCategories(this.jsonData["categories"]);
+        },
+        activateCategory(catname) {
+          for(let cat in this.jsonData["categories"]){
+            if(catname!=cat){
+              this.jsonData["categories"][cat].visible = false
+            }
+          }
+          this.jsonData["categories"][catname].visible=!this.jsonData["categories"][catname].visible
+        },
+        editCategories() {
+          this.show_categories = true;
+        },
+        deleteCategory(catname){
+          for(let page in this.jsonData["pages"]){
+            this.jsonData["pages"][page].category = ""
+          }
+          delete this.jsonData["categories"][catname];
+          console.log(this.jsonData)
+          this.syncData();
         },
 
 

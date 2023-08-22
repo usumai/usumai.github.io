@@ -11,8 +11,8 @@ const jsonData = {
         "id": 2,
         "order_no": 3,
         "title": "Data view page",
-        "content": "",
-        "category": "Data views"
+        "content": "<p><br></p>",
+        "category": ""
       },
       "3": {
         "id": 3,
@@ -25,15 +25,8 @@ const jsonData = {
         "id": 4,
         "order_no": 1,
         "title": "AI layout page",
-        "content": "Layouts/openai.html",
+        "content": "<p>Layouts/openai.html</p>",
         "category": "Layouts"
-      },
-      "5": {
-        "id": 5,
-        "order_no": 1,
-        "title": "Data structure page",
-        "content": "<p>DataSources/datastructure.html</p>",
-        "category": "Data sources"
       },
       "6": {
         "id": 6,
@@ -53,21 +46,22 @@ const jsonData = {
         "id": 8,
         "order_no": 1,
         "title": "New page",
-        "content": "New page",
-        "category": "Data views"
+        "content": "<p>New page</p>",
+        "category": "Data sources"
       }
     },
     "categories": {
       "Layouts": {
-        "order_no": 4
+        "order_no": 4,
+        "visible": false
       },
       "Data views": {
         "order_no": 2,
-        "visible": true
+        "visible": false
       },
       "Data sources": {
         "order_no": 3,
-        "visible": true
+        "visible": false
       }
     }
   }
