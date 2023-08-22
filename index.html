@@ -74,10 +74,13 @@
                       @click="addPage()">Add page</button>
 
 
-              <br><br><br><br><br><br><br><br><br><br><br><hr>
+              <br><br><br><br><br><br><br><br><br><br><br>
+              <br><br><br><br><br><br><br><br><br><br><br>
               <button class="btn btn-outline-dark float-end" 
                       @click="copyToClipboard()">{{ copy_btn_text }}</button>
-              <pre>{{ jsonData }}</pre>
+              <!-- <pre>{{ jsonData }}</pre> -->
+              <br><br><br><br><br><br><br><br><br><br><br>
+              <br><br><br><br><br><br><br><br><br><br><br>
     
             </div>
           </div>
@@ -107,19 +110,26 @@
                 v-if="!show_editor"></div>
 
           <div v-show="show_editor">
-            <p class="lead">Title</p>
-            <input type="text" class="form-control" v-model="selected_page.title">
-
-            <p class="lead">Category</p>
-            <span class="btn btn-sm btn-dark mr-4" @click="selected_page.category=''">Clear</span>
-            <span v-for="(cat, catname) in json_cats" class="btn btn-sm btn-dark mr-4" @click="selected_page.category=catname">{{catname}}</span>
-            <input type="text" class="form-control" v-model="selected_page.category">
-
-            <p class="lead">Order</p>
-            <input type="number" class="form-control" v-model="selected_page.order_no">
-
+            <table class="table lead">
+              <tr>
+                <td width="20%" class="pt-3">Title</td>
+                <td><input type="text" class="form-control" v-model="selected_page.title"></td>
+              </tr>
+              <tr>
+                <td width="20%" class="pt-3">Category</td>
+                <td>
+                  <span class="btn btn-sm btn-dark mr-4" @click="selected_page.category=''">Clear</span>
+                  <span v-for="(cat, catname) in json_cats" class="btn btn-sm btn-dark mr-4" @click="selected_page.category=catname">{{catname}}</span>
+                  <input type="text" class="form-control" v-model="selected_page.category">
+                </td>
+              </tr>
+              <tr>
+                <td width="20%" class="pt-3">Order</td>
+                <td><input type="number" class="form-control" v-model="selected_page.order_no"></td>
+              </tr>
+            </table>
             <p class="lead">Content</p>
-            <div id="editor"></div>
+            <div id="editor" style="height:500px"></div>
           </div>
 
 
