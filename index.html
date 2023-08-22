@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test site</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 </head>
 <body>
 
@@ -39,34 +42,34 @@
               <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto">
+
               <ul class="nav flex-column">
-                <template v-for="(part, partidx) in jsonData">
-                    <li class="nav-item"  v-if="part.doc_title">
-                        <div class="menu_btn" @click="navigateTo(part)">
-                          {{ part.doc_title }}
-                        </div>
-                    </li>
-                    <template class="nav-item" v-else>
-                        <li class="menu_btn" @click="expandPart(partidx)">
-                            {{ partidx }}
-                        </li>
-                        
-                        <li class="nav-item" 
-                            v-for="(subpart, subpartidx) in jsonData[partidx]"
-                            v-if="jsonData[partidx].visible">
-                            <div class="menu_btn" @click="navigateTo(subpart)">
-                            {{ subpart.doc_title }}
-                            </div>
-                        </li>
-                    </template>
-                </template>
-                <li class="nav-item">
-                    <div class="menu_btn" @click="createNewPage()">
-                        Generate new page
-                    </div>
-                </li>
                 
+                <template v-for="(page, pageno) in json_pages">
+                  <li class="nav-item menu_btn"
+                      v-if="page.category==''"
+                      @click="selected_page=page">
+                        >{{ page.title }}
+                  </li>
+                </template>
+
+
+                <template v-for="(cat, catname) in json_cats"
+                :key="catname">
+                  <li class="nav-item menu_btn bg-success" @click="cat.visible=!cat.visible">
+                    {{catname}}
+                  </li>
+                  <template v-for="(page, pageno) in json_pages" v-if="cat.visible">
+                    <li class="nav-item menu_btn"
+                        v-if="page.category==catname"
+                        @click="selected_page=page">
+                          >{{ page.title }}
+                    </li>
+                  </template>
+                </template>
               </ul>
+
+
     
             </div>
           </div>
@@ -74,11 +77,34 @@
     
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">Dashboard</h1>
-          </div>
-          <iframe id="myIframe" width="600" height="400" src="https://www.example.com"></iframe>
+            <h1 class="h2">{{ selected_page.title }}</h1>
+            <span class="float-end" >
+              <button class="btn btn-outline-dark float-end" 
+                      @click="editPage()" 
+                      v-if="selected_page&&!show_editor">Edit</button>
+              <button class="btn btn-outline-dark float-end" 
+                      @click="show_editor=false"
+                      v-if="show_editor">Cancel</button>
+              <button class="btn btn-outline-dark float-end" 
+                      @click="saveContent()"
+                      v-if="show_editor">Save</button>
 
-          {{ message }}
+            </span>
+          </div>
+
+          <div  v-html="selected_page.content"
+                v-if="!show_editor"></div>
+
+          <div v-show="show_editor">
+            <div id="editor" >
+              <p>Hello World!</p>
+            </div>
+          </div>
+
+
+          <br><br><br><br><br><br><br><br><br><br><br><hr>
+          <button class="btn btn-outline-dark float-end" 
+                  @click="copyToClipboard()">Copy</button>
           <pre>{{ jsonData }}</pre>
 
         </main>
@@ -93,38 +119,79 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 
 
+<script>
+  
+</script>
 <script type="module">
   import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js'
 
   createApp({
     data() {
         return {
-            jsonData: jsonData
+            jsonData: jsonData,
+            json_cats: {},
+            json_pages: {},
+            quill: null,
+            selected_page: {},
+            show_editor: false,
         };
     },
     setup() {
-      const message = ref('Hello Vue!')
-      return {
-        message
-      }
+      // this.changeIframeSrc('myIframe', 'homepage.html')
+    },
+    mounted() {
+      this.json_pages = this.reorderCategories(this.jsonData["pages"]);
+      this.json_cats = this.reorderCategories(this.jsonData["categories"]);
+      this.selected_page = this.json_pages[1]
     },
     methods: {
-        navigateTo(part){
-            this.changeIframeSrc('myIframe', part.path);
+        reorderCategories(reorderObj){
+          return Object.entries(reorderObj)
+            .sort((a, b) => a[1].order_no - b[1].order_no)
+            .reduce((acc, [key, value]) => {
+                acc[key] = value;
+                return acc;
+            }, {});
         },
-        changeIframeSrc(iframeId, filename) {
-            const iframe = document.getElementById(iframeId);
-            if (iframe) {
-                let baseUrl = window.location.href.split('/').slice(0, -1).join('/');
-                let newSrc = `${baseUrl}/docs/${filename}`;
-                iframe.src = newSrc;
+
+        async copyToClipboard() {
+          try {
+            // Use the Clipboard API to write the content to the clipboard
+            
+            let jsonString = JSON.stringify(this.jsonData, null, 2); 
+            jsonString="const jsonData = "+jsonString
+            await navigator.clipboard.writeText(jsonString);
+            alert('Content copied to clipboard!');
+          } catch (err) {
+            alert('Failed to copy content: ', err);
+          }
+        },
+
+
+
+        editPage(){
+          this.show_editor = true
+          this.$nextTick(() => {
+            if (!this.quill) {
+              this.quill = new Quill('#editor', {
+                theme: 'snow'
+              });
             }
+            this.quill.root.innerHTML = this.selected_page.content;
+          });
         },
+        saveContent() {
+          this.show_editor = false
+          this.selected_page.content = this.quill.root.innerHTML;
+        },
+
+
+
+
+
+
         isLocallyHosted() {// Use this to autogenerate new pages, using the json file to calc the next page part id
             return window.location.protocol === 'file:';
-        },
-        expandPart(partidx) {
-            this.jsonData[partidx].visible = !this.jsonData[partidx].visible
         },
         createNewPage(){
             let newId = this.getNextDocId()
@@ -140,7 +207,7 @@
                 }
             }
             return maxId + 1;
-        }
+        },
     },
   }).mount('#app')
 </script>
