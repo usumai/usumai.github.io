@@ -45,36 +45,36 @@
             </div>
             <div class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto">
 
+
+
               <ul class="nav flex-column">
-                <template v-for="(page, pageno) in jsonData.pages">
+                <template v-for="pageno in json_page_list">
+                <!-- <template v-for="(page, pageno) in jsonData.pages"> -->
                   <li class="nav-item menu_btn"
                       :class="{'bg-dark':apid==pageno,'text-light':apid==pageno}"
-                      v-if="page.category==''"
-                      @click="changePage(page)">
-                        {{ page.title }}
+                      v-if="jsonData.pages[pageno].category==''"
+                      @click="changePage(jsonData.pages[pageno])">
+                        {{ jsonData.pages[pageno].title }}
                   </li>
                 </template>
                 <template v-for="catname in json_cats" :key="catname">
                   <li class="nav-item menu_btn" 
                       @click="selected_cat=catname">
                     <strong>{{catname}}</strong>
-                    <button class="btn btn-sm btn-danger float-end" 
-                            v-if="show_categories"
-                            @click="deleteCategory(catname)">Delete</button>
                   </li>
                   <template v-if="selected_cat==catname"
-                            v-for="(page, pageno) in jsonData.pages">
+                            v-for="pageno in json_page_list">
                     <li class="nav-item menu_btn"
                         :class="{'bg-dark':apid==pageno,'text-light':apid==pageno}"
-                        v-if="page.category==catname"
-                        @click="changePage(page)">
-                        &nbsp;&nbsp;{{ page.title }}
+                        v-if="jsonData.pages[pageno].category==catname"
+                        @click="changePage(jsonData.pages[pageno])">
+                        &nbsp;&nbsp;{{ jsonData.pages[pageno].title }}
                     </li>
                   </template>
                 </template>
               </ul>
 
-                <hr>
+                <hr v-if="isLocallyHosted()">
                 <button class="btn btn-outline-dark float-end" 
                         v-if="isLocallyHosted()"
                         @click="addPage()">Add page</button>
@@ -107,7 +107,6 @@
               <button class="btn btn-danger float-end" 
                       @click="deletePage()"
                       v-if="show_editor&&selected_page.id!=1">Delete</button>
-
             </span>
           </div>
 
@@ -167,6 +166,7 @@
         return {
             jsonData:       jsonData,
             json_cats:      [],
+            json_page_list: [],
             quill:          null,
             selected_page:  {},
             selected_cat:   "",
@@ -194,6 +194,7 @@
           if(this.selected_page.category){
             this.selected_cat = this.selected_page.category
           }
+          this.reorderPagesByOrderNo(this.jsonData.pages)
         },
         generateCategories(){
           let json_cats = []
@@ -215,13 +216,10 @@
               return 0;
           });
         },
-        reorderCategories(reorderObj){
-          return Object.entries(reorderObj)
-            .sort((a, b) => a[1].order_no - b[1].order_no)
-            .reduce((acc, [key, value]) => {
-                acc[key] = value;
-                return acc;
-            }, {});
+        reorderPagesByOrderNo(data) {
+          const sortedData = Object.values(data).sort((a, b) => a.order_no - b.order_no);
+          this.json_page_list = sortedData.map(item => item.id);
+
         },
         changePage(page){
           this.apid         = page.id
@@ -255,7 +253,6 @@
           this.refreshPage();
         },
         addPage() {
-          // check id doesnt exist
           let arr_existing_ids = []
           let max_id_no = 0;
           for(let pageidx in this.jsonData.pages){
@@ -287,7 +284,6 @@
           link.click();
           document.body.removeChild(link);
         },
-
         async copyToClipboard() {
           for(let cat in this.jsonData["categories"]){
             this.jsonData["categories"][cat].visible = false
@@ -306,8 +302,6 @@
         wait(ms) {
           return new Promise(resolve => setTimeout(resolve, ms));
         },
-
-
 
         isLocallyHosted() {// Use this to autogenerate new pages, using the json file to calc the next page part id
             return window.location.protocol === 'file:';

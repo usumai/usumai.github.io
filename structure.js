@@ -5,14 +5,14 @@ const jsonData = {
         "order_no": 6,
         "title": "Home page",
         "content": "<p>Welcome to my world</p><p><br></p><h1>Cool man</h1>",
-        "category": "aaaa"
+        "category": ""
       },
       "2": {
         "id": 2,
         "order_no": 3,
         "title": "Data view page",
         "content": "<p><br></p>",
-        "category": ""
+        "category": "Data views"
       },
       "3": {
         "id": 3,
@@ -50,4 +50,4 @@ const jsonData = {
         "category": "Data sources"
       }
     }
-  };
+  }
