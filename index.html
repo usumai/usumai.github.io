@@ -79,13 +79,14 @@
 
 
               <br><br><br><br><br><br><br><br><br><br><br>
-              <br><br><br><br><br><br><br><br><br><br><br>
               <button class="btn btn-outline-dark float-end" 
                       @click="addPage()">Add page</button>
               <button class="btn btn-outline-dark float-end" 
                       @click="editCategories()">Categories</button>
               <button class="btn btn-outline-dark float-end" 
                       @click="copyToClipboard()">{{ copy_btn_text }}</button>
+              <button class="btn btn-outline-dark float-end" 
+                      @click="downloadStructure()">Save config</button>
               <pre>{{ jsonData }}</pre>
               <br><br><br><br><br><br><br><br><br><br><br>
               <br><br><br><br><br><br><br><br><br><br><br>
@@ -126,11 +127,14 @@
               <tr>
                 <td width="20%" class="pt-3">Category</td>
                 <td>
-                  <span class="btn btn-sm btn-dark mr-4" @click="selected_page.category=''">Clear</span>
-                  <span v-for="(cat, catname) in json_cats" 
-                        class="btn btn-sm btn-dark mr-4" 
-                        v-if="catname!=''"
-                        @click="selected_page.category=catname">{{catname}}</span>
+                  <div>
+                    <span class="btn btn-sm btn-dark me-1" @click="selected_page.category=''">Clear</span>
+                    <button v-for="(cat, catname) in json_cats" 
+                          class="btn btn-sm btn-dark me-1" 
+                          v-if="catname!=''"
+                          @click="selected_page.category=catname">{{catname}}</button>
+
+                  </div>
                   <input type="text" class="form-control" v-model="selected_page.category">
                 </td>
               </tr>
@@ -305,6 +309,21 @@
         },
 
 
+        downloadStructure() {
+          // Convert JSON data to string format for .js file
+          const jsContent = "const jsonData = " + JSON.stringify(this.jsonData, null, 2) + ";";
+
+          // Create a Blob object from the string
+          const blob = new Blob([jsContent], { type: "text/javascript" });
+
+          // Create a download link and trigger the download
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "structure.js";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        },
 
 
 
