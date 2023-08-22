@@ -4,7 +4,7 @@ const jsonData = {
         "id": 1,
         "order_no": 6,
         "title": "Home page",
-        "content": "<p>Hello World!</p><p><strong>hellow</strong></p><p><br></p><h1><strong>asdasdasdasd</strong></h1>",
+        "content": "<p>Welcome to my world</p><p><br></p><h1>Cool man</h1>",
         "category": ""
       },
       "2": {
@@ -30,10 +30,31 @@ const jsonData = {
       },
       "5": {
         "id": 5,
-        "order_no": 6,
+        "order_no": 1,
         "title": "Data structure page",
-        "content": "DataSources/datastructure.html",
+        "content": "<p>DataSources/datastructure.html</p>",
         "category": "Data sources"
+      },
+      "6": {
+        "id": 6,
+        "order_no": 2,
+        "title": "New page",
+        "content": "<p>New page</p>",
+        "category": "Data views"
+      },
+      "7": {
+        "id": 7,
+        "order_no": 1,
+        "title": "First",
+        "content": "<p>New page</p>",
+        "category": "Data views"
+      },
+      "8": {
+        "id": 8,
+        "order_no": 1,
+        "title": "New page",
+        "content": "New page",
+        "category": "Data views"
       }
     },
     "categories": {
@@ -41,10 +62,12 @@ const jsonData = {
         "order_no": 4
       },
       "Data views": {
-        "order_no": 2
+        "order_no": 2,
+        "visible": true
       },
       "Data sources": {
-        "order_no": 3
+        "order_no": 3,
+        "visible": true
       }
     }
   }
