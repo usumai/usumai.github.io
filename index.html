@@ -46,8 +46,7 @@
             <div class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto">
 
               <ul class="nav flex-column">
-                
-                <template v-for="(page, pageno) in json_pages">
+                <template v-for="(page, pageno) in jsonData.pages">
                   <li class="nav-item menu_btn"
                       :class="{'bg-dark':apid==pageno,'text-light':apid==pageno}"
                       v-if="page.category==''"
@@ -55,17 +54,16 @@
                         {{ page.title }}
                   </li>
                 </template>
-
-
-                <template v-for="(cat, catname) in json_cats" :key="catname">
+                <template v-for="catname in json_cats" :key="catname">
                   <li class="nav-item menu_btn" 
-                      @click="activateCategory(catname)">
+                      @click="selected_cat=catname">
                     <strong>{{catname}}</strong>
                     <button class="btn btn-sm btn-danger float-end" 
                             v-if="show_categories"
                             @click="deleteCategory(catname)">Delete</button>
                   </li>
-                  <template v-for="(page, pageno) in json_pages" v-if="cat.visible">
+                  <template v-if="selected_cat==catname"
+                            v-for="(page, pageno) in jsonData.pages">
                     <li class="nav-item menu_btn"
                         :class="{'bg-dark':apid==pageno,'text-light':apid==pageno}"
                         v-if="page.category==catname"
@@ -75,21 +73,18 @@
                   </template>
                 </template>
               </ul>
-              
 
+                <hr>
+                <button class="btn btn-outline-dark float-end" 
+                        v-if="isLocallyHosted()"
+                        @click="addPage()">Add page</button>
+                <button class="btn btn-outline-dark float-end" 
+                        v-if="isLocallyHosted()"
+                        @click="downloadStructure()">Save config</button>
+                <button class="btn btn-outline-dark float-end" 
+                        v-if="isLocallyHosted()"
+                        @click="copyToClipboard()">Copy config</button>
 
-              <br><br><br><br><br><br><br><br><br><br><br>
-              <button class="btn btn-outline-dark float-end" 
-                      @click="addPage()">Add page</button>
-              <button class="btn btn-outline-dark float-end" 
-                      @click="editCategories()">Categories</button>
-              <button class="btn btn-outline-dark float-end" 
-                      @click="copyToClipboard()">{{ copy_btn_text }}</button>
-              <button class="btn btn-outline-dark float-end" 
-                      @click="downloadStructure()">Save config</button>
-              <pre>{{ jsonData }}</pre>
-              <br><br><br><br><br><br><br><br><br><br><br>
-              <br><br><br><br><br><br><br><br><br><br><br>
     
             </div>
           </div>
@@ -101,6 +96,7 @@
             <span class="float-end" >
               <button class="btn btn-outline-dark float-end" 
                       @click="editPage()" 
+                      v-if="isLocallyHosted()"
                       v-if="selected_page&&!show_editor">Edit</button>
               <button class="btn btn-outline-dark float-end" 
                       @click="show_editor=false"
@@ -129,11 +125,10 @@
                 <td>
                   <div>
                     <span class="btn btn-sm btn-dark me-1" @click="selected_page.category=''">Clear</span>
-                    <button v-for="(cat, catname) in json_cats" 
+                    <button v-for="(catname) in json_cats" 
                           class="btn btn-sm btn-dark me-1" 
                           v-if="catname!=''"
                           @click="selected_page.category=catname">{{catname}}</button>
-
                   </div>
                   <input type="text" class="form-control" v-model="selected_page.category">
                 </td>
@@ -148,7 +143,7 @@
           </div>
 
 
-
+            
         </main>
       </div>
     </div>
@@ -171,10 +166,10 @@
     data() {
         return {
             jsonData:       jsonData,
-            json_cats:      {},
-            json_pages:     {},
+            json_cats:      [],
             quill:          null,
             selected_page:  {},
+            selected_cat:   "",
             copy_btn_text:  "Copy structure",
             apid:           "",
             show_editor:    false,
@@ -182,29 +177,44 @@
         };
     },
     setup() {
-      // let url_params = new URLSearchParams(window.location.search);
-      // this.apid = url_params.get('apid')
-      // if(this.apid){
-      //   this.selected_page = this.json_pages[this.apid]
-      // }else{
-        // this.selected_page = this.json_pages[1]
-      // }
-      // this.changeIframeSrc('myIframe', 'homepage.html')
     },
     mounted() {
       let url_params = new URLSearchParams(window.location.search);
       this.apid = url_params.get('apid')
-      this.syncData();
-      if(this.apid){
-        this.selected_page = this.json_pages[this.apid]
-      }else{
-        this.selected_page = this.json_pages[1]
-      }
-      if(this.selected_page.category){
-        this.jsonData.categories[this.selected_page.category].visible=true;
-      }
+      this.refreshPage();
     },
     methods: {
+        refreshPage(){
+          this.generateCategories();
+          if(this.apid&&this.jsonData.pages[this.apid]){
+            this.selected_page = this.jsonData.pages[this.apid]
+          }else{
+            this.selected_page = this.jsonData.pages[1]
+          }
+          if(this.selected_page.category){
+            this.selected_cat = this.selected_page.category
+          }
+        },
+        generateCategories(){
+          let json_cats = []
+          for(let idx in jsonData.pages){
+            let page = jsonData.pages[idx]
+            if (page.category!=''&&!json_cats.includes(page.category)) {
+              json_cats.push(page.category);
+            }
+          }
+          this.json_cats = this.caseInsensitiveSort(json_cats);
+        },
+        caseInsensitiveSort(arr) {
+          return arr.slice().sort((a, b) => {
+              const lowerA = a.toLowerCase();
+              const lowerB = b.toLowerCase();
+
+              if (lowerA < lowerB) return -1;
+              if (lowerA > lowerB) return 1;
+              return 0;
+          });
+        },
         reorderCategories(reorderObj){
           return Object.entries(reorderObj)
             .sort((a, b) => a[1].order_no - b[1].order_no)
@@ -213,35 +223,15 @@
                 return acc;
             }, {});
         },
-
-        async copyToClipboard() {
-          
-          for(let cat in this.jsonData["categories"]){
-            this.jsonData["categories"][cat].visible = false
-          }
-          try {
-            let jsonString = JSON.stringify(this.jsonData, null, 2); 
-            jsonString="const jsonData = "+jsonString
-            await navigator.clipboard.writeText(jsonString);
-            this.copy_btn_text = "Copied!"
-          } catch (err) {
-            this.copy_btn_text = "Copy failed!"
-          }
-          await this.wait(5000);
-          this.copy_btn_text = "Copy structure"
-        },
-
-        wait(ms) {
-          return new Promise(resolve => setTimeout(resolve, ms));
-        },
-
-
         changePage(page){
-          this.apid = page.id
-          this.selected_page=page
-          this.show_editor = false
+          this.apid         = page.id
+          this.selected_page= page
+          this.show_editor  = false
           window.history.pushState({}, '', '?apid='+this.apid)
         },
+
+
+
         editPage(){
           this.show_editor = true
           this.$nextTick(() => {
@@ -256,25 +246,26 @@
         saveContent() {
           this.show_editor = false
           this.selected_page.content = this.quill.root.innerHTML;
+          this.refreshPage();
         },
         deletePage() {
           delete this.jsonData["pages"][this.selected_page.id]
-          this.syncData();
-          this.show_editor = false
-          this.selected_page = false
+          this.show_editor    = false
+          this.selected_page  = false
+          this.refreshPage();
         },
         addPage() {
           // check id doesnt exist
           let arr_existing_ids = []
           let max_id_no = 0;
-          for(let pageidx in this.json_pages){
+          for(let pageidx in this.jsonData.pages){
             pageidx = parseInt(pageidx)
             max_id_no = parseInt(max_id_no)
-            let page = this.json_pages[pageidx]
+            let page = this.jsonData.pages[pageidx]
             max_id_no = pageidx>=max_id_no ? pageidx+1 : max_id_no;
             arr_existing_ids.push(pageidx)
           }
-          let newPage = {...this.json_pages[1]}
+          let newPage = {...this.jsonData.pages[1]}
           newPage.id = max_id_no
           newPage.title = "New page"
           newPage.order_no = 1
@@ -282,41 +273,13 @@
           newPage.category = ""
           let max_id_no_str = max_id_no.toString();
           this.jsonData.pages[max_id_no_str] = {...newPage}
-          this.syncData();
         },
-        syncData() {
-          this.json_pages = this.reorderCategories(this.jsonData["pages"]);
-          this.json_cats = this.reorderCategories(this.jsonData["categories"]);
-        },
-        activateCategory(catname) {
-          for(let cat in this.jsonData["categories"]){
-            if(catname!=cat){
-              this.jsonData["categories"][cat].visible = false
-            }
-          }
-          this.jsonData["categories"][catname].visible=!this.jsonData["categories"][catname].visible
-        },
-        editCategories() {
-          this.show_categories = true;
-        },
-        deleteCategory(catname){
-          for(let page in this.jsonData["pages"]){
-            this.jsonData["pages"][page].category = ""
-          }
-          delete this.jsonData["categories"][catname];
-          console.log(this.jsonData)
-          this.syncData();
-        },
+        
 
 
         downloadStructure() {
-          // Convert JSON data to string format for .js file
           const jsContent = "const jsonData = " + JSON.stringify(this.jsonData, null, 2) + ";";
-
-          // Create a Blob object from the string
           const blob = new Blob([jsContent], { type: "text/javascript" });
-
-          // Create a download link and trigger the download
           const link = document.createElement("a");
           link.href = URL.createObjectURL(blob);
           link.download = "structure.js";
@@ -325,6 +288,24 @@
           document.body.removeChild(link);
         },
 
+        async copyToClipboard() {
+          for(let cat in this.jsonData["categories"]){
+            this.jsonData["categories"][cat].visible = false
+          }
+          try {
+            let jsonString = JSON.stringify(this.jsonData, null, 2); 
+            jsonString="const jsonData = "+jsonString
+            await navigator.clipboard.writeText(jsonString);
+            this.copy_btn_text = "Copied!"
+          } catch (err) {
+            this.copy_btn_text = "Copy failed!"
+          }
+          await this.wait(5000);
+          this.copy_btn_text = "Copy structure"
+        },
+        wait(ms) {
+          return new Promise(resolve => setTimeout(resolve, ms));
+        },
 
 
 

@@ -5,7 +5,7 @@ const jsonData = {
         "order_no": 6,
         "title": "Home page",
         "content": "<p>Welcome to my world</p><p><br></p><h1>Cool man</h1>",
-        "category": ""
+        "category": "aaaa"
       },
       "2": {
         "id": 2,
@@ -49,19 +49,5 @@ const jsonData = {
         "content": "<p>New page</p>",
         "category": "Data sources"
       }
-    },
-    "categories": {
-      "Layouts": {
-        "order_no": 4,
-        "visible": false
-      },
-      "Data views": {
-        "order_no": 2,
-        "visible": false
-      },
-      "Data sources": {
-        "order_no": 3,
-        "visible": false
-      }
     }
-  }
+  };
