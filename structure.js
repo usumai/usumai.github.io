@@ -3,51 +3,16 @@ const jsonData = {
       "1": {
         "id": 1,
         "order_no": 6,
-        "title": "Home page",
-        "content": "<iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/oCcks-fwq2c?showinfo=0\"></iframe><p>Documentation</p>",
+        "title": "Ultra small docs",
+        "content": "<p>The lighest weight documentation CMS! (as far as I know)</p><p><br></p>",
         "category": ""
       },
       "2": {
         "id": 2,
-        "order_no": 3,
-        "title": "Data view page",
-        "content": "<p><br></p>",
-        "category": "Data views"
-      },
-      "3": {
-        "id": 3,
-        "order_no": 2,
-        "title": "Layout page",
-        "content": "Layouts/layout.html",
-        "category": "Layouts"
-      },
-      "4": {
-        "id": 4,
         "order_no": 1,
-        "title": "AI layout page",
-        "content": "<p>Layouts/openai.html</p>",
-        "category": "Layouts"
-      },
-      "6": {
-        "id": 6,
-        "order_no": 2,
-        "title": "New page",
-        "content": "<p>New page</p>",
-        "category": "Data views"
-      },
-      "7": {
-        "id": 7,
-        "order_no": 1,
-        "title": "First",
-        "content": "<p>New page</p>",
-        "category": "Data views"
-      },
-      "8": {
-        "id": 8,
-        "order_no": 1,
-        "title": "New page",
-        "content": "<p>New page</p>",
-        "category": "Data sources"
+        "title": "Structure.js",
+        "content": "<p>The system uses a single js file with JSON stored in a variable. This limits the overall size of the documentation that can be stored on the site, but makes the whole thing incredibly light. </p><p><br></p><p>Thus, this would ideally be used for smaller documentation purposes.</p><p><br></p><p><br></p><pre class=\"ql-syntax\" spellcheck=\"false\">const jsonData = {\n&nbsp; &nbsp; \"pages\": {\n&nbsp; &nbsp; &nbsp; \"1\": {\n&nbsp; &nbsp; &nbsp; &nbsp; \"id\": 1,\n&nbsp; &nbsp; &nbsp; &nbsp; \"order_no\": 6,\n&nbsp; &nbsp; &nbsp; &nbsp; \"title\": \"Ultra small docs\",\n&nbsp; &nbsp; &nbsp; &nbsp; \"content\": \"&lt;p&gt;The lighest weight documentation CMS! (as far as I know)&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;\",\n&nbsp; &nbsp; &nbsp; &nbsp; \"category\": \"\"\n&nbsp; &nbsp; &nbsp; },\n&nbsp; &nbsp; &nbsp; \"2\": {\n&nbsp; &nbsp; &nbsp; &nbsp; \"id\": 2,\n&nbsp; &nbsp; &nbsp; &nbsp; \"order_no\": 1,\n&nbsp; &nbsp; &nbsp; &nbsp; \"title\": \"Structure.js\",\n&nbsp; &nbsp; &nbsp; &nbsp; \"content\": \"&lt;p&gt;The system uses a single js file with JSON stored in a variable. This limits the overall size of the documentation that can be stored on the site, but makes the whole thing incredibly light. &lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;Thus, this would ideally be used for smaller documentation purposes.&lt;/p&gt;\",\n&nbsp; &nbsp; &nbsp; &nbsp; \"category\": \"Databaseless\"\n&nbsp; &nbsp; &nbsp; }\n&nbsp; &nbsp; }\n&nbsp; }\n</pre>",
+        "category": "Databaseless"
       }
     }
   }
