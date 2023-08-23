@@ -235,7 +235,14 @@
           this.$nextTick(() => {
             if (!this.quill) {
               this.quill = new Quill('#editor', {
-                theme: 'snow'
+                theme: 'snow',
+                modules: {
+                  toolbar: [
+                    ['bold', 'italic'],
+                    ['link', 'blockquote', 'video'],  // Include the 'video' button
+                    [{ list: 'ordered' }, { list: 'bullet' }]
+                  ]
+                },
               });
             }
             this.quill.root.innerHTML = this.selected_page.content;

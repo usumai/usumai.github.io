@@ -4,7 +4,7 @@ const jsonData = {
         "id": 1,
         "order_no": 6,
         "title": "Home page",
-        "content": "<p>Welcome to my world</p><p><br></p><h1>Cool man</h1>",
+        "content": "<iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/oCcks-fwq2c?showinfo=0\"></iframe><p>Documentation</p>",
         "category": ""
       },
       "2": {
